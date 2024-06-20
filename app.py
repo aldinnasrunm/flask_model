@@ -2,8 +2,25 @@ import tensorflow as tf
 import numpy as np
 from flask import Flask, request, jsonify
 import keras_cv
+import requests
 
-model = tf.keras.models.load_model('yolo_model.keras')
+# model = tf.keras.models.load_model('yolo_model.keras')
+# Step 1: Download the model
+url = 'https://github.com/aldinnasrunm/flask_model/blob/main/yolo_model.keras?raw=true'
+local_path = 'yolo_model_up.keras'
+
+response = requests.get(url)
+if response.status_code == 200:
+    with open(local_path, 'wb') as f:
+        f.write(response.content)
+    print(f'Model downloaded and saved as {local_path}')
+else:
+    print(f'Failed to download the model. Status code: {response.status_code}')
+    exit(1)
+
+model = tf.keras.models.load_model(local_path)
+print('Model loaded successfully')
+
 
 def preprocess_single_image(file_storage):
     try:
